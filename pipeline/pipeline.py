@@ -9,6 +9,8 @@ from sagemaker.pytorch import PyTorch
 from sagemaker.pytorch.model import PyTorchModel
 from sagemaker.processing import ProcessingInput, ProcessingOutput
 from sagemaker.sklearn.processing import SKLearnProcessor
+from sagemaker.workflow.model_step import ModelStep
+from sagemaker.model import Model
 
 role = "arn:aws:iam::915992498469:role/service-role/AmazonSageMaker-ExecutionRole-20250326T110603"
 pipeline_session = PipelineSession()
@@ -68,24 +70,25 @@ training_step = TrainingStep(
 )
 
 # Step 3: Register Model (✅ use PyTorchModel instead of generic Model)
-model = PyTorchModel(
+model = Model(
+    image_uri=sagemaker.image_uris.retrieve(
+        framework='pytorch',
+        region=pipeline_session.boto_region_name,
+        version='2.1.0',
+        py_version='py310',
+        instance_type='ml.m5.xlarge'
+    ),
+    model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
     entry_point='src/inference.py',
     role=role,
-    model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
-    framework_version="2.1.0",
-    py_version="py310",
     sagemaker_session=pipeline_session
 )
 
-register_step = RegisterModel(
+register_step = ModelStep(
     name="RegisterTrainedModel",
-    model=model,
-    content_types=["application/x-npy"],
-    response_types=["application/json"],
-    inference_instances=["ml.m5.large", "ml.m5.xlarge"],
-    transform_instances=["ml.m5.large"],
-    model_package_group_name="CIFakeModelGroup",
-    approval_status=model_approval_status
+    step_args=model.create(
+        instance_type="ml.m5.xlarge"
+    )
 )
 
 def get_pipeline(pipeline_session, role):

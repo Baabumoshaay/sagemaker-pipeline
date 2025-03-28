@@ -76,7 +76,8 @@ model = Model(
         region=pipeline_session.boto_region_name,
         version='2.1.0',
         py_version='py310',
-        instance_type='ml.m5.xlarge'
+        instance_type='ml.m5.xlarge',
+        image_scope='inference'
     ),
     model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
     entry_point='src/inference.py',

@@ -2,19 +2,15 @@
 import sagemaker
 from sagemaker.workflow.pipeline import Pipeline
 from sagemaker.workflow.steps import ProcessingStep, TrainingStep
-from sagemaker.workflow.model_step import ModelStep
+from sagemaker.workflow.step_collections import RegisterModel
 from sagemaker.workflow.parameters import ParameterString, ParameterInteger, ParameterFloat
 from sagemaker.workflow.pipeline_context import PipelineSession
-from sagemaker.workflow.step_collections import RegisterModel
 from sagemaker.pytorch import PyTorch
+from sagemaker.pytorch.model import PyTorchModel
 from sagemaker.processing import ProcessingInput, ProcessingOutput
 from sagemaker.sklearn.processing import SKLearnProcessor
-from sagemaker.model import Model
-from sagemaker.workflow.properties import PropertyFile
-from sagemaker.workflow.execution_variables import ExecutionVariables
 
 role = "arn:aws:iam::915992498469:role/service-role/AmazonSageMaker-ExecutionRole-20250326T110603"
-region = sagemaker.Session().boto_region_name
 pipeline_session = PipelineSession()
 bucket = 'cifake-mlops'
 
@@ -71,12 +67,13 @@ training_step = TrainingStep(
     inputs={"training": processing_step.properties.ProcessingOutputConfig.Outputs["processed_data"].S3Output.S3Uri}
 )
 
-# Step 3: Register Model
-model = Model(
-    image_uri=estimator.training_image_uri(),
-    model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
+# Step 3: Register Model (✅ use PyTorchModel instead of generic Model)
+model = PyTorchModel(
     entry_point='src/inference.py',
     role=role,
+    model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
+    framework_version="2.1.0",
+    py_version="py310",
     sagemaker_session=pipeline_session
 )
 
@@ -91,10 +88,17 @@ register_step = RegisterModel(
     approval_status=model_approval_status
 )
 
-# Pipeline
+# Final Pipeline Definition
 pipeline = Pipeline(
     name="CIFakeDetectionPipeline",
-    parameters=[processing_instance_type, training_instance_type, batch_size, epochs, learning_rate, model_approval_status],
+    parameters=[
+        processing_instance_type,
+        training_instance_type,
+        batch_size,
+        epochs,
+        learning_rate,
+        model_approval_status
+    ],
     steps=[processing_step, training_step, register_step],
     sagemaker_session=pipeline_session
 )

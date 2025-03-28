@@ -3,7 +3,8 @@ from pipeline import pipeline  # Make sure pipeline.py is in the same directory
 from sagemaker.workflow.pipeline import Pipeline
 
 # Create or update pipeline
-pipeline.upsert(role_arn=role)
+pipeline_session = PipelineSession()
+pipeline.upsert(role_arn="arn:aws:iam::915992498469:role/service-role/AmazonSageMaker-ExecutionRole-20250326T110603")
 print(f"✅ Pipeline '{pipeline.name}' created or updated.")
 
 # Start pipeline execution

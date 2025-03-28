@@ -13,7 +13,7 @@ from sagemaker.model import Model
 from sagemaker.workflow.properties import PropertyFile
 from sagemaker.workflow.execution_variables import ExecutionVariables
 
-role = sagemaker.get_execution_role()
+role = "arn:aws:iam::915992498469:role/service-role/AmazonSageMaker-ExecutionRole-20250326T110603"
 region = sagemaker.Session().boto_region_name
 pipeline_session = PipelineSession()
 bucket = 'cifake-mlops'

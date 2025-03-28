@@ -1,7 +1,8 @@
 # pipeline.py
 import sagemaker
 from sagemaker.workflow.pipeline import Pipeline
-from sagemaker.workflow.steps import ProcessingStep, TrainingStep, ModelStep
+from sagemaker.workflow.steps import ProcessingStep, TrainingStep
+from sagemaker.workflow.model_step import ModelStep
 from sagemaker.workflow.parameters import ParameterString, ParameterInteger, ParameterFloat
 from sagemaker.workflow.pipeline_context import PipelineSession
 from sagemaker.workflow.model_step import RegisterModel

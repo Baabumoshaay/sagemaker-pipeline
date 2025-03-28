@@ -5,7 +5,7 @@ from sagemaker.workflow.steps import ProcessingStep, TrainingStep
 from sagemaker.workflow.model_step import ModelStep
 from sagemaker.workflow.parameters import ParameterString, ParameterInteger, ParameterFloat
 from sagemaker.workflow.pipeline_context import PipelineSession
-from sagemaker.workflow.model_step import RegisterModel
+from sagemaker.model import RegisterModel
 from sagemaker.pytorch import PyTorch
 from sagemaker.processing import ProcessingInput, ProcessingOutput
 from sagemaker.sklearn.processing import SKLearnProcessor

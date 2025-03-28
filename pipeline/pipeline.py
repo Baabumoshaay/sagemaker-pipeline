@@ -45,12 +45,12 @@ processing_step = ProcessingStep(
     outputs=[
         ProcessingOutput(output_name="processed_data", source="/opt/ml/processing/output")
     ],
-    code='../src/preprocess.py',
+    code='src/preprocess.py'
 )
 
 # Step 2: Training
 estimator = PyTorch(
-    entry_point="../src/train.py",
+    entry_point='src/train.py',
     role=role,
     instance_count=1,
     instance_type=training_instance_type,
@@ -75,7 +75,7 @@ training_step = TrainingStep(
 model = Model(
     image_uri=estimator.training_image_uri(),
     model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
-    entry_point="../src/inference.py",
+    entry_point='src/inference.py',
     role=role,
     sagemaker_session=pipeline_session
 )

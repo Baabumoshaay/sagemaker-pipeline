@@ -88,17 +88,18 @@ register_step = RegisterModel(
     approval_status=model_approval_status
 )
 
-# Final Pipeline Definition
-pipeline = Pipeline(
-    name="CIFakeDetectionPipeline",
-    parameters=[
-        processing_instance_type,
-        training_instance_type,
-        batch_size,
-        epochs,
-        learning_rate,
-        model_approval_status
-    ],
-    steps=[processing_step, training_step, register_step],
-    sagemaker_session=pipeline_session
-)
+def get_pipeline(pipeline_session, role):
+    return Pipeline(
+        name="CIFakeDetectionPipeline",
+        parameters=[
+            processing_instance_type,
+            training_instance_type,
+            batch_size,
+            epochs,
+            learning_rate,
+            model_approval_status
+        ],
+        steps=[processing_step, training_step, register_step],
+        sagemaker_session=pipeline_session
+    )
+

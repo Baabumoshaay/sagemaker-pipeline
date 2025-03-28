@@ -1,16 +1,18 @@
-# deploy.py
-from pipeline import pipeline  # Make sure pipeline.py is in the same directory
+from pipeline import get_pipeline
 from sagemaker.workflow.pipeline import Pipeline
+from sagemaker.workflow.pipeline_context import PipelineSession
 
-# Create or update pipeline
+role = "arn:aws:iam::915992498469:role/service-role/AmazonSageMaker-ExecutionRole-20250326T110603"
 pipeline_session = PipelineSession()
-pipeline.upsert(role_arn="arn:aws:iam::915992498469:role/service-role/AmazonSageMaker-ExecutionRole-20250326T110603")
+
+# build the pipeline
+pipeline = get_pipeline(pipeline_session=pipeline_session, role=role)
+
+pipeline.upsert(role_arn=role)
 print(f"✅ Pipeline '{pipeline.name}' created or updated.")
 
-# Start pipeline execution
 execution = pipeline.start()
 print(f"🚀 Execution started. Execution ARN: {execution.arn}")
 
-# Wait for execution to complete (optional)
 execution.wait()
 print("🎉 Pipeline execution completed!")
